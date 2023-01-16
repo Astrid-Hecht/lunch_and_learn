@@ -1,6 +1,6 @@
 class EdamamFacade
   def self.recipe_search(query)
-    target_fields = %i[label image url country]
+    target_fields = %i[title image url country]
 
     results = EdamamService.recipe_search(query)[:hits]
 
@@ -10,6 +10,7 @@ class EdamamFacade
 
     results.map! do |hit|
       hit[:country] = query
+      hit[:title] = hit[:label]
       Recipe.new(hit.select { |key, _value| target_fields.include?(key) })
     end
     results
