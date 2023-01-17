@@ -6,5 +6,5 @@ class User < ApplicationRecord
   validates_presence_of :api_key
   validates_uniqueness_of :api_key
 
-  
+
 end
