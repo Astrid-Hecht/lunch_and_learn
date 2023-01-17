@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UnsplashService do
-  let(:photo_search) { UnsplashService.photo_search("China") }
+  let(:photo_search) { UnsplashService.photo_search('China') }
 
   it 'can search photos', :vcr do
     expect(channel_search).to be_a(Hash)
