@@ -1,6 +1,6 @@
 class UnsplashFacade
   def self.photo_search(query)
-    results = UnsplashService.photo_search(query)[:results].limit(10)
+    results = UnsplashService.photo_search(query)[:results].first(10)
 
     results.map! do |photo|
       photo[:url] = photo[:urls][:full]

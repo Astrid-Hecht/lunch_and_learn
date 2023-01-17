@@ -9,7 +9,7 @@ RSpec.describe UnsplashFacade do
     first_hit = photo_search.first
     expect(first_hit).to be_a(Hash)
 
-    expect(first_hit.keys).to eq(%i[alt_tag url])
+    expect(first_hit.keys).to eq(%i[url alt_tag])
     expect(first_hit[:alt_tag]).to be_a String
     expect(first_hit[:url]).to be_a String
   end

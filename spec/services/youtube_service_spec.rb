@@ -7,11 +7,11 @@ RSpec.describe YoutubeService do
     expect(channel_search).to be_a(Hash)
     expect(channel_search[:items]).to be_a(Array)
 
-    first_hit = channel_search[:hits].first
+    first_hit = channel_search[:items].first
     expect(first_hit).to be_a(Hash)
 
-    expect(first_hit[:id][:channelId]).to eq('UCluQ5yInbeAkkeCndNnUhpw')
     expect(first_hit[:id][:videoId]).to be_a(String)
+    expect(first_hit[:snippet][:channelId]).to eq('UCluQ5yInbeAkkeCndNnUhpw')
     expect(first_hit[:snippet][:title]).to be_a(String)
   end
 end

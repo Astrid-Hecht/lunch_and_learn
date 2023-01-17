@@ -1,10 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe LearningResource do
-  let(:learning_resource_data) do
-    { country: 'China', video: 'www.youtube.com', images: ['www.pic1.com', 'www.pic2.com'] }
+  let(:learning_resource) do
+    LearningResource.new('China', 'www.youtube.com', ['www.pic1.com', 'www.pic2.com'])
   end
-  let(:learning_resource) { LearningResource.new(learning_resource_data) }
 
   it 'attributes' do
     expect(learning_resource.country).to eq('China')

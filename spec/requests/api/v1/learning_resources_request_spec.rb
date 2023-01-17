@@ -22,7 +22,7 @@ RSpec.describe 'Learning Resources', type: :request do
         expect(resource[:attributes].keys).to eq(%i[country video images])
 
         expect(resource[:id]).to be_nil
-        expect(resource[:type]).to eq('learing_resource')
+        expect(resource[:type]).to eq('learning_resource')
         expect(resource[:attributes]).to be_a Hash
 
         expect(resource[:attributes][:country]).to be_a(String)
@@ -32,7 +32,7 @@ RSpec.describe 'Learning Resources', type: :request do
 
         expect(resource[:attributes][:images]).to be_a(Array)
         expect(resource[:attributes][:images].first).to be_a(Hash)
-        expect(resource[:attributes][:images].first.keys).to eq([:alt_tag, :url])
+        expect(resource[:attributes][:images].first.keys).to eq([:url, :alt_tag])
         expect(resource[:attributes][:images].first[:alt_tag]).to be_a String
         expect(resource[:attributes][:images].first[:url]).to be_a String
       end
@@ -40,7 +40,7 @@ RSpec.describe 'Learning Resources', type: :request do
 
     context 'renders error' do
       it 'if no search search parameters', :vcr do
-        get '/api/v1/resources'
+        get '/api/v1/learning_resources'
 
         parsed_response = JSON.parse(response.body, symbolize_names: true)
 
@@ -51,7 +51,7 @@ RSpec.describe 'Learning Resources', type: :request do
       end
 
       it 'if country is invalid', :vcr do
-        get '/api/v1/resources?country=Globglorbgorb'
+        get '/api/v1/learning_resources?country=Globglorbgorb'
   
         parsed_response = JSON.parse(response.body, symbolize_names: true)
   
@@ -79,7 +79,7 @@ RSpec.describe 'Learning Resources', type: :request do
         expect(resource[:attributes].keys).to eq(%i[country video images])
 
         expect(resource[:id]).to be_nil
-        expect(resource[:type]).to eq('learing_resource')
+        expect(resource[:type]).to eq('learning_resource')
         expect(resource[:attributes]).to be_a Hash
 
         expect(resource[:attributes][:country]).to be_a(String)
@@ -89,7 +89,7 @@ RSpec.describe 'Learning Resources', type: :request do
 
         expect(resource[:attributes][:images]).to be_a(Array)
         expect(resource[:attributes][:images].first).to be_a(Hash)
-        expect(resource[:attributes][:images].first.keys).to eq([:alt_tag, :url])
+        expect(resource[:attributes][:images].first.keys).to eq([:url, :alt_tag])
         expect(resource[:attributes][:images].first[:alt_tag]).to be_a String
         expect(resource[:attributes][:images].first[:url]).to be_a String
       end

@@ -6,10 +6,9 @@ class UnsplashService
   end
 
   def self.photo_search(query)
-    response = conn.get('/search') do |f|
+    response = conn.get('/search/photos') do |f|
       f.params['query'] = "#{query}"
     end
-
     JSON.parse(response.body, symbolize_names: true)
   end
 end
