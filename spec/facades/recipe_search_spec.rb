@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe RecipeFacade do
-  let(:recipe_search) { RecipeFacade.recipe_search("China") }
-  
-  context "#recipe_search" do
+  let(:recipe_search) { RecipeFacade.recipe_search('China') }
+
+  context '#recipe_search' do
     it 'extracts relevant data', :vcr do
       expect(recipe_search).to be_a(Array)
 
