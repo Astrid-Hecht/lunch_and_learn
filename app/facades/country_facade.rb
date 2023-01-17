@@ -3,7 +3,7 @@ class CountryFacade
     results = CountryService.list_countries
 
     results.map! do |country|
-      country[:name]
+      country[:name].downcase
     end
   end
 end

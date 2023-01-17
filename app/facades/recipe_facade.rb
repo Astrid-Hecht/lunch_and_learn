@@ -1,8 +1,16 @@
 class RecipeFacade
   def self.recipe_search(query)
-    target_fields = %i[title image url country]
+    results = RecipeService.recipe_search(query)
 
-    results = RecipeService.recipe_search(query)[:hits]
+    if results[:count].positive?
+      search_mapper(results[:hits], query)
+    else
+      false
+    end
+  end
+
+  def self.search_mapper(results, query)
+    target_fields = %i[title image url country]
 
     results.map! do |raw_hit|
       raw_hit[:recipe]
@@ -15,4 +23,6 @@ class RecipeFacade
     end
     results
   end
+
+  private_class_method :search_mapper
 end

@@ -1,13 +1,20 @@
 class Api::V1::RecipesController < ApplicationController
   def index
-    country = params[:q]
+    render json: search_checker(params[:country])
+  end
+
+  private
+
+  def search_checker(country)
     country_list = CountryFacade.list_countries
     country ||= country_list.sample(1)
 
-    if country_list.include(country)
-      render json: RecipeSerializer.new(RecipeFacade.recipe_search(country))
+    if !country_list.include?(country.downcase)
+      { error: { status: 404, msg: 'placeholder error until error handling is set up' } }
+    elsif (results = RecipeFacade.recipe_search(country))
+      RecipeSerializer.new(results)
     else
-      render json: []
+      []
     end
   end
 end
