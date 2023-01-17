@@ -56,7 +56,7 @@ RSpec.describe 'Recipes', type: :request do
     end
 
     context 'no search term randomly generates country' do
-      it 'and renders valid results with no extra data', :vcr do
+      it 'and renders valid results with no extra data' do
         get '/api/v1/recipes'
 
         parsed_response = JSON.parse(response.body, symbolize_names: true)
