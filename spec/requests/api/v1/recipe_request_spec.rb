@@ -56,7 +56,7 @@ RSpec.describe 'Recipes', type: :request do
     end
 
     context 'no search term randomly generates country' do
-      it 'and renders valid results with no extra data' do
+      it 'and renders valid results with no extra data', :vcr do
         get '/api/v1/recipes'
 
         parsed_response = JSON.parse(response.body, symbolize_names: true)
@@ -83,7 +83,7 @@ RSpec.describe 'Recipes', type: :request do
     end
 
     context 'renders empty array' do
-      it 'if country is invalid' do
+      it 'if country is invalid', :vcr do
         get '/api/v1/recipes?country=Globglorbgorb'
 
         parsed_response = JSON.parse(response.body, symbolize_names: true)
@@ -94,7 +94,7 @@ RSpec.describe 'Recipes', type: :request do
         expect(parsed_response[:data].keys).to eq([:error])
       end
 
-      it 'if country has is empty string' do
+      it 'if country has is empty string', :vcr do
         get '/api/v1/recipes?country= '
 
         parsed_response = JSON.parse(response.body, symbolize_names: true)
@@ -105,7 +105,7 @@ RSpec.describe 'Recipes', type: :request do
         expect(parsed_response[:data]).to eq([])
       end
 
-      it 'if country has no recipes' do
+      it 'if country has no recipes', :vcr do
         get '/api/v1/recipes?country=Namibia'
 
         parsed_response = JSON.parse(response.body, symbolize_names: true)
