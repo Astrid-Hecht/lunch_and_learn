@@ -94,6 +94,17 @@ RSpec.describe 'Recipes', type: :request do
         expect(parsed_response[:data].keys).to eq([:error])
       end
 
+      it 'if country has is empty string' do
+        get '/api/v1/recipes?country= '
+
+        parsed_response = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response.status).to eq(200)
+
+        expect(parsed_response.keys).to eq([:data])
+        expect(parsed_response[:data]).to eq([])
+      end
+
       it 'if country has no recipes' do
         get '/api/v1/recipes?country=Namibia'
 
