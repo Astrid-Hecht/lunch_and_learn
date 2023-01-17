@@ -15,10 +15,10 @@ RSpec.describe 'Favorites', type: :request do
         expect(response).to be_successful
         expect(response.status).to eq(201)
 
-        expect(created_fav.api_key).to eq(fav_params[:api_key])
+        expect(created_fav.user).to eq(user)
         expect(created_fav.country).to eq(fav_params[:country])
         expect(created_fav.recipe_link).to eq(fav_params[:recipe_link])
-        expect(created_fav.recip_title).to eq(fav_params[:recip_title])
+        expect(created_fav.recipe_title).to eq(fav_params[:recipe_title])
 
         body = JSON.parse(response.body, symbolize_names: true)
 
