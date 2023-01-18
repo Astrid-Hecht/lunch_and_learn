@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Users', type: :request do
   describe 'Users API endpoint' do
-    let(:user_params) { { name: 'Jomby', email: 'jomby@gmail.com' } }
+    let(:user_params) { { name: 'Jomby', email: 'JoMBy@gmail.com' } }
     context '- happy path -' do
       it 'can create a new user' do
         headers = { 'CONTENT_TYPE' => 'application/json' }
@@ -14,7 +14,7 @@ RSpec.describe 'Users', type: :request do
         expect(response.status).to eq(201)
 
         expect(created_user.name).to eq(user_params[:name])
-        expect(created_user.email).to eq(user_params[:email])
+        expect(created_user.email).to eq(user_params[:email].downcase)
         expect(created_user.api_key).to be_a String
         expect(created_user.api_key.length).to_not eq(0)
 
@@ -30,28 +30,61 @@ RSpec.describe 'Users', type: :request do
           expect(v).to be_a(String)
         end
       end
+
+      it 'doesnt allow POST request to assign api_key' do
+        headers = { 'CONTENT_TYPE' => 'application/json' }
+        user_params[:api_key] = 'imahackerlol'
+        post '/api/v1/users', headers: headers, params: JSON.generate(user_params)
+
+        created_user = User.last
+
+        expect(response).to be_successful
+        expect(response.status).to eq(201)
+
+        expect(created_user.api_key).not_to eq('imahackerlol')
+        expect(User.all.count).to eq(1)
+      end
+
+      it 'lowercases email in db' do
+        headers = { 'CONTENT_TYPE' => 'application/json' }
+        user_params[:email] = 'JOMBY@GMAIL.com'
+
+        post '/api/v1/users', headers: headers, params: JSON.generate(user_params)
+
+        created_user = User.last
+
+        expect(response).to be_successful
+        expect(response.status).to eq(201)
+
+        expect(created_user.email).not_to eq('JOMBY@GMAIL.com')
+        expect(created_user.email).to eq('jomby@gmail.com')
+        expect(User.all.count).to eq(1)
+      end
     end
 
     context '- sad path -' do
       it 'doesnt create a new user if already used email' do
         create(:user, name: 'Feybo', email: 'jomby@gmail.com') # also shows that email uniqueness is case-insensitive
         headers = { 'CONTENT_TYPE' => 'application/json' }
+
         post '/api/v1/users', headers: headers, params: JSON.generate(user_params)
+
         created_user = User.last
 
-        # expect(response).not_to be_successful
-        # expect(response.status).to eq(403)
+        expect(response).not_to be_successful
+        expect(response.status).to eq(400)
+
         expect(created_user.name).not_to eq('Jomby')
         expect(created_user.name).to eq('Feybo')
-        expect(created_user.email).to eq(user_params[:email])
+        expect(created_user.email).to eq(user_params[:email].downcase)
         expect(User.all.count).to eq(1)
 
-        expect(response.status).to eq(200)
-
         body = JSON.parse(response.body, symbolize_names: true)
+        error = body[:data]
 
-        expect(body.keys).to eq([:data])
-        expect(body[:data].keys).to eq([:error])
+        expect(error[:id]).to be_nil
+        expect(error[:type]).to eq('error')
+        expect(error[:attributes]).to eq({ status: 400, msg: 'Bad request, check your parameters' })
       end
 
       it 'doesnt create a new user if invalid body passed in' do
@@ -72,31 +105,19 @@ RSpec.describe 'Users', type: :request do
 
         created_user = User.last
 
-        # expect(response).not_to be_successful
-        # expect(response.status).to eq(403)
+        expect(response).not_to be_successful
+        expect(response.status).to eq(400)
+
         expect(created_user.name).not_to eq('Jomby')
         expect(created_user.name).to eq('Feybo')
         expect(User.all.count).to eq(1)
 
-        expect(response.status).to eq(200)
-
         body = JSON.parse(response.body, symbolize_names: true)
+        error = body[:data]
 
-        expect(body.keys).to eq([:data])
-        expect(body[:data].keys).to eq([:error])
-      end
-
-      it 'doesnt allow POST request to assign api_key' do
-        headers = { 'CONTENT_TYPE' => 'application/json' }
-        user_params[:api_key] = 'imahackerlol'
-        post '/api/v1/users', headers: headers, params: JSON.generate(user_params)
-
-        created_user = User.last
-
-        expect(response).to be_successful
-        expect(response.status).to eq(201)
-        expect(created_user.api_key).not_to eq('imahackerlol')
-        expect(User.all.count).to eq(1)
+        expect(error[:id]).to be_nil
+        expect(error[:type]).to eq('error')
+        expect(error[:attributes]).to eq({ status: 400, msg: 'Bad request, check your parameters' })
       end
     end
   end

@@ -88,10 +88,14 @@ RSpec.describe 'Recipes', type: :request do
 
         parsed_response = JSON.parse(response.body, symbolize_names: true)
 
-        expect(response.status).to eq(200)
+        expect(response).not_to be_successful
+        expect(response.status).to eq(404)
 
-        expect(parsed_response.keys).to eq([:data])
-        expect(parsed_response[:data].keys).to eq([:error])
+        error = parsed_response[:data]
+
+        expect(error[:id]).to be_nil
+        expect(error[:type]).to eq('error')
+        expect(error[:attributes]).to eq({ status: 404, msg: 'Country not found' })
       end
     end
 
