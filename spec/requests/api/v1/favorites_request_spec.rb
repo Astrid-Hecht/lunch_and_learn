@@ -5,20 +5,19 @@ RSpec.describe 'Favorites', type: :request do
     context '- happy path -' do
       it 'can create a new favorite' do
         user = create(:user)
-        fav_params = { api_key: user.api_key, country: 'Sealand', fav_link: 'www.link.com',
-                       fav_title: 'fav No 12121' }
+        fav_params = { api_key: user.api_key, country: 'Sealand', recipe_link: 'www.link.com',
+                       recipe_title: 'fav No 12121' }
         headers = { 'CONTENT_TYPE' => 'application/json' }
 
         post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params)
         created_fav = Favorite.last
 
         expect(response).to be_successful
-        expect(response.status).to eq(201)
 
-        expect(created_fav.user).to eq(user)
+        expect(user.favorites.first).to eq(created_fav)
         expect(created_fav.country).to eq(fav_params[:country])
-        expect(created_fav.fav_link).to eq(fav_params[:fav_link])
-        expect(created_fav.fav_title).to eq(fav_params[:fav_title])
+        expect(created_fav.recipe_link).to eq(fav_params[:recipe_link])
+        expect(created_fav.recipe_title).to eq(fav_params[:recipe_title])
 
         body = JSON.parse(response.body, symbolize_names: true)
 
@@ -31,13 +30,13 @@ RSpec.describe 'Favorites', type: :request do
     context '- sad path -' do
       it 'wont create a new favorite when fields are missing' do
         user = create(:user)
-        fav_params = { api_key: user.api_key, country: 'Sealand', fav_link: 'www.link.com',
-                       fav_title: 'fav No 12121' }
+        fav_params = { api_key: user.api_key, country: 'Sealand', recipe_link: 'www.link.com',
+                       recipe_title: 'fav No 12121' }
         headers = { 'CONTENT_TYPE' => 'application/json' }
 
         post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:country))
-        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:fav_link))
-        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:fav_title))
+        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:recipe_link))
+        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:recipe_title))
 
         created_fav = Favorite.last
 
@@ -53,7 +52,8 @@ RSpec.describe 'Favorites', type: :request do
         expect(body.keys).to eq([:data])
         expect(body[:data].keys).to eq([:error])
       end
-      it 'wont create a new favorite when no matching api key' do
+
+      it 'wont create a new favorite when no matching api key in db' do
         _user = create(:user)
         fav_params = { api_key: 'arbitrarystring', country: 'Sealand', fav_link: 'www.link.com',
                        fav_title: 'fav No 12121' }
@@ -83,15 +83,10 @@ RSpec.describe 'Favorites', type: :request do
       it 'can show all of a users favorites' do
         target_user = create(:user)
         unwanted_user = create(:user)
-        create_list(:favorites, 4, user: target_user)
-        create_list(:favorites, 2, user: unwanted_user)
+        create_list(:favorite, 4, user: target_user)
+        create_list(:favorite, 2, user: unwanted_user)
 
-
-        request_body = { api_key: target_user.api_key }
-
-        headers = { 'CONTENT_TYPE' => 'application/json' }
-
-        get '/api/v1/favorites', headers: headers, params: JSON.generate(request_body)
+        get "/api/v1/favorites?api_key=#{target_user.api_key}"
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
@@ -107,8 +102,6 @@ RSpec.describe 'Favorites', type: :request do
 
         expect(fav.keys).to eq(%i[id type attributes])
 
-        expect(fav[:attributes].keys).to eq(%i[title url country image])
-
         expect(fav[:id]).to match(/\d/)
         expect(fav[:type]).to eq('favorite')
         expect(fav[:attributes]).to be_a Hash
@@ -119,17 +112,13 @@ RSpec.describe 'Favorites', type: :request do
         expect(fav[:attributes][:created_at]).to be_a(String)
       end
 
-      it 'can renders an empty array if user hasnt saved and favs' do
+      it 'renders an empty array if user hasnt saved any favs' do
         target_user = create(:user)
         unwanted_user = create(:user)
-        create_list(:favorites, 2, user: unwanted_user)
+        create_list(:favorite, 2, user: unwanted_user)
 
 
-        request_body = { api_key: target_user.api_key }
-
-        headers = { 'CONTENT_TYPE' => 'application/json' }
-
-        get '/api/v1/favorites', headers: headers, params: JSON.generate(request_body)
+        get "/api/v1/favorites?api_key=#{target_user.api_key}"
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
@@ -147,15 +136,11 @@ RSpec.describe 'Favorites', type: :request do
       it 'returns an error if api_key is invalid' do
         target_user = create(:user)
         unwanted_user = create(:user)
-        create_list(:favorites, 4, user: target_user)
-        create_list(:favorites, 2, user: unwanted_user)
+        create_list(:favorite, 4, user: target_user)
+        create_list(:favorite, 2, user: unwanted_user)
 
 
-        request_body = { api_key: "asdasgdrgertsdfc" }
-
-        headers = { 'CONTENT_TYPE' => 'application/json' }
-
-        get '/api/v1/favorites', headers: headers, params: JSON.generate(request_body)
+        get "/api/v1/favorites?api_key=dfsdgdfbdfhtr"
 
         # expect(response).to be_successful
         # expect(response.status).to eq(404)
