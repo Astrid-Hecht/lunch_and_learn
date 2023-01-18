@@ -33,15 +33,15 @@ RSpec.describe 'Favorites', type: :request do
         fav_params = { api_key: user.api_key, country: 'Sealand', recipe_link: 'www.link.com',
                        recipe_title: 'fav No 12121' }
         headers = { 'CONTENT_TYPE' => 'application/json' }
-
-        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:country))
-        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:recipe_link))
-        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:recipe_title))
+        fav_params.delete(:country)
+        post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params)
+        # post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:recipe_link))
+        # post '/api/v1/favorites', headers: headers, params: JSON.generate(fav_params.delete(:recipe_title))
 
         created_fav = Favorite.last
 
-        # expect(response).to be_successful
-        # expect(response.status).to eq(201)
+        expect(response).not_to be_successful
+        expect(response.status).to eq(400)
 
         expect(created_fav).to eq(nil)
         expect(Favorite.all.count).to eq(0)
@@ -50,7 +50,13 @@ RSpec.describe 'Favorites', type: :request do
 
         expect(body).to be_a Hash
         expect(body.keys).to eq([:data])
-        expect(body[:data].keys).to eq([:error])
+        expect(body[:data].keys).to eq([:id, :type, :attributes])
+
+        error = body[:data]
+
+        expect(error[:id]).to be_nil
+        expect(error[:type]).to eq('error')
+        expect(error[:attributes]).to eq({ status: 400, msg: 'Bad request, check parameters' })
       end
 
       it 'wont create a new favorite when no matching api key in db' do
@@ -63,8 +69,8 @@ RSpec.describe 'Favorites', type: :request do
 
         created_fav = Favorite.last
 
-        # expect(response).to be_successful
-        # expect(response.status).to eq(201)
+        expect(response).not_to be_successful
+        expect(response.status).to eq(404)
 
         expect(created_fav).to eq(nil)
         expect(Favorite.all.count).to eq(0)
@@ -73,7 +79,13 @@ RSpec.describe 'Favorites', type: :request do
 
         expect(body).to be_a Hash
         expect(body.keys).to eq([:data])
-        expect(body[:data].keys).to eq([:error])
+        expect(body[:data].keys).to eq([:id, :type, :attributes])
+
+        error = body[:data]
+
+        expect(error[:id]).to be_nil
+        expect(error[:type]).to eq('error')
+        expect(error[:attributes]).to eq({ status: 404, msg: 'User not found' })
       end
     end
   end
@@ -142,15 +154,20 @@ RSpec.describe 'Favorites', type: :request do
 
         get "/api/v1/favorites?api_key=dfsdgdfbdfhtr"
 
-        # expect(response).to be_successful
-        # expect(response.status).to eq(404)
+        expect(response).not_to be_successful
+        expect(response.status).to eq(404)
 
         body = JSON.parse(response.body, symbolize_names: true)
 
+        expect(body).to be_a Hash
         expect(body.keys).to eq([:data])
-        expect(body[:data]).to be_a Hash
+        expect(body[:data].keys).to eq([:id, :type, :attributes])
 
-        expect(body[:data].keys).to eq([:error])
+        error = body[:data]
+
+        expect(error[:id]).to be_nil
+        expect(error[:type]).to eq('error')
+        expect(error[:attributes]).to eq({ status: 404, msg: 'User not found' })
       end
     end
   end

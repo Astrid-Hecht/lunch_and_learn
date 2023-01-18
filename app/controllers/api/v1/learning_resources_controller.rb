@@ -2,8 +2,10 @@ class Api::V1::LearningResourcesController < ApplicationController
   def index
     if params[:country].present? && CountryFacade.list_countries.include?(params[:country].downcase)
       render json: LearningResourceSerializer.new(learning_resource_constructor(params[:country]))
+    elsif params[:country].present?
+      render json: ErrorSerializer.new(Error.new(404, 'Country not found')), status: 404
     else
-      render json: { data: { error: { status: 404, msg: 'placeholder error until error handling is set up' } } }
+      render json: ErrorSerializer.new(Error.new(400, 'Missing or invalid parameters')), status: 400
     end
   end
 
