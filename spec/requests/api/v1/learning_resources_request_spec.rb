@@ -28,11 +28,11 @@ RSpec.describe 'Learning Resources', type: :request do
         expect(resource[:attributes][:country]).to be_a(String)
 
         expect(resource[:attributes][:video]).to be_a(Hash)
-        expect(resource[:attributes][:video].keys).to eq([:title, :youtube_video_id])
+        expect(resource[:attributes][:video].keys).to eq(%i[title youtube_video_id])
 
         expect(resource[:attributes][:images]).to be_a(Array)
         expect(resource[:attributes][:images].first).to be_a(Hash)
-        expect(resource[:attributes][:images].first.keys).to eq([:url, :alt_tag])
+        expect(resource[:attributes][:images].first.keys).to eq(%i[url alt_tag])
         expect(resource[:attributes][:images].first[:alt_tag]).to be_a String
         expect(resource[:attributes][:images].first[:url]).to be_a String
       end
@@ -45,18 +45,18 @@ RSpec.describe 'Learning Resources', type: :request do
         parsed_response = JSON.parse(response.body, symbolize_names: true)
 
         expect(response.status).to eq(200)
-  
+
         expect(parsed_response.keys).to eq([:data])
         expect(parsed_response[:data].keys).to eq([:error])
       end
 
       it 'if country is invalid', :vcr do
         get '/api/v1/learning_resources?country=Globglorbgorb'
-  
+
         parsed_response = JSON.parse(response.body, symbolize_names: true)
-  
+
         expect(response.status).to eq(200)
-  
+
         expect(parsed_response.keys).to eq([:data])
         expect(parsed_response[:data].keys).to eq([:error])
       end
@@ -89,7 +89,7 @@ RSpec.describe 'Learning Resources', type: :request do
 
         expect(resource[:attributes][:images]).to be_a(Array)
         expect(resource[:attributes][:images].first).to be_a(Hash)
-        expect(resource[:attributes][:images].first.keys).to eq([:url, :alt_tag])
+        expect(resource[:attributes][:images].first.keys).to eq(%i[url alt_tag])
         expect(resource[:attributes][:images].first[:alt_tag]).to be_a String
         expect(resource[:attributes][:images].first[:url]).to be_a String
       end
