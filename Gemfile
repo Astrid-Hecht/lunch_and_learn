@@ -44,9 +44,6 @@ group :development do
 end
 
 group :test do
-  gem 'capybara'
-  gem 'launchy'
-  gem 'orderly'
   gem 'rspec-rails'
   gem 'shoulda-matchers'
   gem 'simplecov'
@@ -61,5 +58,3 @@ gem 'net-http'
 gem 'jsonapi-serializer'
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-gem "countries", "~> 5.3"

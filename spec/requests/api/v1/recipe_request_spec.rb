@@ -82,7 +82,7 @@ RSpec.describe 'Recipes', type: :request do
       end
     end
 
-    context 'renders empty array' do
+    context 'renders relevant error' do
       it 'if country is invalid', :vcr do
         get '/api/v1/recipes?country=Globglorbgorb'
 
@@ -93,7 +93,9 @@ RSpec.describe 'Recipes', type: :request do
         expect(parsed_response.keys).to eq([:data])
         expect(parsed_response[:data].keys).to eq([:error])
       end
+    end
 
+    context 'renders empty array' do
       it 'if country has is empty string', :vcr do
         get '/api/v1/recipes?country= '
 
