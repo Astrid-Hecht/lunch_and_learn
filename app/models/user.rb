@@ -10,6 +10,8 @@ class User < ApplicationRecord
 
   has_many :favorites, dependent: :destroy
 
+  private
+  
   def key_gen
     self.api_key = SecureRandom.uuid 
   end
